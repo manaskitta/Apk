@@ -1,0 +1,56 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String          @id @default(cuid())
+  clerkUserId  String          @unique
+  firstName    String?
+  lastName     String?
+  email        String          @unique
+  reminders    Reminder[]      // reverse relation to Reminder
+  registrations Registration[] // reverse relation to Registration
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+model Event {
+  id            String          @id @default(cuid())
+  name          String
+  description   String?
+  date          DateTime
+  reminders     Reminder[]      // reverse relation to Reminder
+  registrations Registration[]  // reverse relation to Registration
+}
+
+model Registration {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   String
+  createdAt DateTime @default(now())
+}
+
+model News {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Reminder {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   String
+  createdAt DateTime @default(now())
+}
